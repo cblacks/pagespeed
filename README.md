@@ -6,22 +6,20 @@ A PHP module to interact with the [PageSpeed Insights API](https://developers.go
 Installation
 ============
 
-The best way to install the library is by using [Composer](http://getcomposer.org). Add the following to `composer.json` in the root of your project:
+Add the following to the composer.json
 
 ``` javascript
-{
-    "require": {
-        "sgrodzicki/pagespeed": "~2.0"
-    }
-}
+"repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/cblacks/pagespeed"
+        }
+],
 ```
 
-Then, on the command line:
+Then require the following package:
+```"sgrodzicki/pagespeed": "master",```
 
-``` bash
-curl -s http://getcomposer.org/installer | php
-php composer.phar install
-```
 
 Use the generated `vendor/.composer/autoload.php` file to autoload the library classes.
 
