@@ -4,13 +4,14 @@ namespace PageSpeed\Insights;
 
 use PageSpeed\Insights\Exception\InvalidArgumentException;
 use PageSpeed\Insights\Exception\RuntimeException;
+use GuzzleHttp\Client;
 
 class Service
 {
 	/**
 	 * @var string
 	 */
-	private $gateway = 'https://www.googleapis.com/pagespeedonline/v5';
+	private $gateway = 'https://www.googleapis.com/pagespeedonline/v5/';
 
 	/**
 	 * Returns PageSpeed score, page statistics, and PageSpeed formatted results for specified URL
@@ -23,33 +24,30 @@ class Service
 	 * @throws Exception\InvalidArgumentException
 	 * @throws Exception\RuntimeException
 	 */
-	public function getResults($url, $locale = 'en_US', $strategy = 'desktop', array $extraParams = null)
+	public function getResults($url, $locale = 'en_US', $strategy = 'desktop')
 	{
 		if (0 === preg_match('#http(s)?://.*#i', $url)) {
 			throw new InvalidArgumentException('Invalid URL');
 		}
 
-		$client = new \Guzzle\Service\Client($this->gateway);
+		$client = new Client([
+            'base_uri' => $this->gateway
+        ]);
 
-		/** @var $request \Guzzle\Http\Message\Request */
-		$request = $client->get('runPagespeed');
-		$request->getQuery()
-			->set('prettyprint', false) // reduce the response payload size
-			->set('url', $url)
-			->set('locale', $locale)
-			->set('strategy', $strategy);
-
-		if (isset($extraParams)) {
-			$query = $request->getQuery();
-			foreach($extraParams as $key=>$value)
-			{
-				$query[$key] = $value;
-			}
-		}
 
 		try {
-			$response = $request->send();
-			$response = $response->getBody();
+		/** @var $request \Guzzle\Http\Message\Request */
+		$request = $client->request('GET', 'runPagespeed', [
+            'query' => [
+                'prettyprint' => false,
+                'url' => $url,
+                'locale' =>  $locale,
+                'strategy' => $strategy
+            ]
+
+        ]);
+
+			$response = $request->getBody();
 			$response = json_decode($response, true);
 
 			return $response;
